@@ -1,0 +1,78 @@
+<Window
+    x:Class="NexusApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="EDG Nexus App Design — Gallery">
+
+    <!--
+        Gallery shell. A stock NavigationView (not retemplated) builds its pane
+        from ScreenCatalog so the nav and GalleryHomePage index can never drift.
+        Peripherals are category headers; screens are the leaf items beneath them.
+
+        RequestedTheme on RootGrid is the single Light/Dark lever — all
+        {ThemeResource} tokens in the tree re-resolve automatically.
+        BackgroundCanvas paints the shell so NavigationView's transparent pane
+        shows the correct surface in both themes.
+    -->
+    <Grid x:Name="RootGrid"
+          RequestedTheme="Light"
+          Background="{ThemeResource BackgroundCanvas}">
+
+        <NavigationView x:Name="NavView"
+                        IsSettingsVisible="False"
+                        IsBackButtonVisible="Collapsed"
+                        SelectionChanged="NavView_SelectionChanged">
+
+            <NavigationView.PaneFooter>
+                <!-- Light / Dark toggle — same pattern as ether-sandbox -->
+                <Button x:Name="ThemeToggle"
+                        Click="ThemeToggle_Click"
+                        Content="☀ Light"
+                        FontFamily="{StaticResource RobotoFont}"
+                        FontSize="11" FontWeight="SemiBold"
+                        Padding="8,4,8,4"
+                        Margin="8"
+                        CornerRadius="4"
+                        HorizontalAlignment="Stretch"
+                        Foreground="{ThemeResource TextSecondary}"/>
+            </NavigationView.PaneFooter>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Title bar strip (48px) -->
+                    <RowDefinition Height="48"/>
+                    <!-- Page content -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Title bar strip -->
+                <Border Grid.Row="0"
+                        Background="{ThemeResource BackgroundCanvas}"
+                        BorderBrush="{ThemeResource BorderSubtle}"
+                        BorderThickness="0,0,0,1"
+                        Padding="24,0,24,0">
+                    <Grid>
+                        <TextBlock Text="EDG Nexus App Design"
+                                   FontFamily="{StaticResource InstrumentSans}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="Peripheral screen gallery"
+                                   FontFamily="{StaticResource RobotoFont}"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextTertiary}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Content frame -->
+                <Frame x:Name="ContentFrame"
+                       Grid.Row="1"
+                       Background="{ThemeResource BackgroundCanvas}"
+                       Navigated="ContentFrame_Navigated"
+                       NavigationFailed="ContentFrame_NavigationFailed"/>
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Window>

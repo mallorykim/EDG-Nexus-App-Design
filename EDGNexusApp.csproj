@@ -1,0 +1,150 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>NexusApp</RootNamespace>
+    <AssemblyName>EDGNexusApp</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!--
+      x64 only for now: EtherDesignLibrary only officially supports x64.
+      Expand platforms here once Ether adds x86 / arm64 support.
+    -->
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWinUI>true</UseWinUI>
+    <!--
+      CS0436: WinUI 3 ProjectReference quirk — the XAML type-info generator
+      pulls source files from referenced library projects into the app's
+      compilation context. This creates apparent duplicate type definitions
+      (source vs. compiled DLL). The binary is correct; suppress the noise.
+    -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <!-- Unpackaged — no Package.appxmanifest required -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Windows App SDK / BuildTools — pinned to same versions as EtherDesignLibrary -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" />
+    <!-- WinUI3 colored shadows — required by Ether components -->
+    <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.250402" />
+    <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Ether design-system — local project references.
+       When Ether is published to a NuGet feed, swap these two
+       ProjectReferences for PackageReferences:
+         Ether.DesignSystem.Foundation  (tokens)
+         Ether.DesignSystem.Controls    (controls + styles)
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <ProjectReference Include="..\EtherDesignLibrary\src\Ether.DesignSystem.Foundation\Ether.DesignSystem.Foundation.csproj" />
+    <ProjectReference Include="..\EtherDesignLibrary\src\Ether.DesignSystem.Controls\Ether.DesignSystem.Controls.csproj" />
+    <!-- Nexus-specific component library -->
+    <ProjectReference Include="Nexus.Components\Nexus.Components.csproj" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Exclude Nexus.Components from the app's SDK auto-include.
+       The sub-project lives inside the app's directory tree, so
+       the SDK default glob would otherwise pick up its XAML and
+       .cs files a second time (causing PRI duplicate-entry errors
+       and duplicate partial-class members). The library is already
+       compiled and linked via the ProjectReference above.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Page Remove="Nexus.Components\**\*" />
+    <Compile Remove="Nexus.Components\**\*" />
+    <None Remove="Nexus.Components\**\*" />
+    <EmbeddedResource Remove="Nexus.Components\**\*" />
+    <Content Remove="Nexus.Components\**\*" />
+
+    <!-- Same reasoning: Nexus.Components.Gallery is its own standalone WinUI app
+         (own App.xaml/MainWindow.xaml) — do not let EDGNexusApp's default glob
+         pull its files in too. -->
+    <Page Remove="Nexus.Components.Gallery\**\*" />
+    <Compile Remove="Nexus.Components.Gallery\**\*" />
+    <None Remove="Nexus.Components.Gallery\**\*" />
+    <EmbeddedResource Remove="Nexus.Components.Gallery\**\*" />
+    <Content Remove="Nexus.Components.Gallery\**\*" />
+
+    <!-- archive/ holds prototype controls/pages that are NOT meant to compile
+         (see AGENTS.md "archive/ folder"). -->
+    <Page Remove="archive\**\*" />
+    <Compile Remove="archive\**\*" />
+    <None Remove="archive\**\*" />
+    <EmbeddedResource Remove="archive\**\*" />
+    <Content Remove="archive\**\*" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       App entry point
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Page Remove="src\App\App.xaml" />
+    <ApplicationDefinition Include="src\App\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Update="src\App\App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="src\App\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       XAML pages — app shell, themes, and views only.
+       Nexus controls live in Nexus.Components and are compiled
+       there; they do NOT appear in this glob.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Page Update="src\App\MainWindow.xaml;src\Themes\**\*.xaml;src\Views\**\*.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Link>%(Filename)%(Extension)</Link>
+    </Page>
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Fonts
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Content Include="Fonts\Instrument_Sans\InstrumentSans-VariableFont_wdth,wght.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Inter\Inter-VariableFont_opsz,wght.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- ── Content-area textures (Nexus device surface) ── -->
+  <ItemGroup>
+    <Content Include="Assets\Textures\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- ── Device product images (peripheral detail screens) ── -->
+  <ItemGroup>
+    <Content Include="Assets\Images\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

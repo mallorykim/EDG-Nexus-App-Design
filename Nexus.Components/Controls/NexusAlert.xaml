@@ -1,0 +1,151 @@
+<!--
+    NexusAlert.xaml — Nexus Pattern — Status alert banner with dismiss button.
+
+    BINDABLE STATE
+      AlertType  — alert severity: Information, Warning, or Error (OneWay);
+                   drives which left icon is shown. Container colors are always
+                   neutral (background/surface-raised); only the icon conveys type.
+      Message    — alert message text displayed in the center (OneWay)
+
+    COMMANDS
+      DismissCommand — invoked when the user clicks the dismiss (×) button;
+                       CommandParameter = null
+
+    EVENTS (for code-behind consumers)
+      Dismissed — raised when the user clicks the dismiss (×) button
+
+    Layout (left → right):
+      [Border: background/surface-raised, border/subtle, radius/control, padding = space/md]
+        [Icon grid 24×24]  (space/md gap)  [Message text (*)]  (10px gap)  [× dismiss (12×12)]
+
+    Three PathIcon elements share the same 24×24 Grid cell; the one matching
+    AlertType is Visible, the other two are Collapsed. Styles and Foregrounds are
+    set in XAML via {StaticResource}/{ThemeResource} — the only proven-correct
+    pattern for PathIcon Data resolution in this SDK version (see EtherIconGeometries.xaml
+    header note on Geometry coercion and why code-based Style assignment is avoided).
+
+    Spacing tokens (Figma → Ether):
+      spacing/16  →  {StaticResource PaddingMd}  =  16 epx  (container padding, all sides)
+      spacing/16  →  {StaticResource space/md}   =  16 epx  (icon ↔ text gap, StackPanel.Spacing)
+      spacing/10  →  literal Margin "10,0,0,0"   =  10 epx  (text ↔ × button; no space/10 token)
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik  node 1461:50581
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusAlert"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        IMPORTANT: Do NOT reference other NexusApp.Controls UserControls here
+        via <nexus:OtherControl>. The WinUI3 XAML toolchain cannot handle
+        intra-library UserControl cross-references in a ProjectReference context
+        (produces WMC0610). Inline shared visuals or compose in code-behind.
+    -->
+
+    <!--
+        Alert container — always a neutral surface; severity is communicated
+        through the icon colour only, not through background tinting.
+    -->
+    <Border x:Name="AlertContainer"
+            Background="{ThemeResource background/surface-raised}"
+            BorderBrush="{ThemeResource border/subtle}"
+            BorderThickness="1"
+            Padding="{StaticResource PaddingMd}"
+            CornerRadius="{StaticResource radius/control}">
+
+        <!-- Inner layout: [icon + text ← fills width] | [× dismiss] -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: icon cell + message text -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="{StaticResource space/md}"
+                        VerticalAlignment="Center">
+
+                <!--
+                    Icon cell — three PathIcons overlap in the same 24×24 Grid;
+                    code-behind shows exactly one by toggling Visibility.
+
+                    Styles are applied in XAML via {StaticResource} so that
+                    WinUI's DP type-converter creates a fresh Geometry per element
+                    (avoids the Geometry-sharing exception described in
+                    EtherIconGeometries.xaml). Foregrounds use {ThemeResource}
+                    so they track light/dark theme automatically.
+                -->
+                <Grid Width="{StaticResource IconSizeMd}"
+                      Height="{StaticResource IconSizeMd}"
+                      VerticalAlignment="Center">
+
+                    <!-- Information icon (collapsed by default) -->
+                    <PathIcon x:Name="InfoIcon"
+                              Style="{StaticResource IconAlertInfoCir}"
+                              Foreground="{ThemeResource status/info/fg}"
+                              Width="{StaticResource IconSizeMd}"
+                              Height="{StaticResource IconSizeMd}"
+                              Visibility="Collapsed"
+                              AutomationProperties.Name="Information alert"/>
+
+                    <!-- Warning icon (collapsed by default) -->
+                    <PathIcon x:Name="WarningIcon"
+                              Style="{StaticResource IconAlertNotice}"
+                              Foreground="{ThemeResource status/warning/fg}"
+                              Width="{StaticResource IconSizeMd}"
+                              Height="{StaticResource IconSizeMd}"
+                              Visibility="Collapsed"
+                              AutomationProperties.Name="Warning alert"/>
+
+                    <!-- Error icon (visible by default — matches AlertType.Error default) -->
+                    <PathIcon x:Name="ErrorIcon"
+                              Style="{StaticResource IconAlertError}"
+                              Foreground="{ThemeResource status/danger/fg}"
+                              Width="{StaticResource IconSizeMd}"
+                              Height="{StaticResource IconSizeMd}"
+                              Visibility="Visible"
+                              AutomationProperties.Name="Error alert"/>
+                </Grid>
+
+                <!-- Message text (OneWay from DependencyProperty) -->
+                <TextBlock Text="{x:Bind Message, Mode=OneWay}"
+                           Style="{StaticResource body/m-regular}"
+                           Foreground="{ThemeResource text/primary}"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- Right: dismiss (×) button — ghost/transparent variant -->
+            <Button x:Name="DismissButton"
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    Click="DismissButton_Click"
+                    AutomationProperties.Name="Dismiss alert">
+                <Button.Resources>
+                    <!--
+                        Override WinUI default Button background/border brush keys
+                        to produce a borderless transparent (ghost) icon button.
+                    -->
+                    <SolidColorBrush x:Key="ButtonBackground"             Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver"  Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBackgroundPressed"      Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBackgroundDisabled"     Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBorderBrush"            Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBorderBrushPressed"     Color="Transparent"/>
+                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled"    Color="Transparent"/>
+                </Button.Resources>
+
+                <!-- × close icon -->
+                <PathIcon Style="{StaticResource IconCloseX}"
+                          Foreground="{ThemeResource icon/primary}"
+                          Width="{StaticResource IconSize2xs}"
+                          Height="{StaticResource IconSize2xs}"/>
+            </Button>
+        </Grid>
+    </Border>
+</UserControl>

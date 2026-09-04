@@ -1,0 +1,30 @@
+<Application
+    x:Class="NexusApp.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--
+                    Framework default control resources (brushes/styles like
+                    TabViewButtonBackground) that NavigationView's own template depends
+                    on. Unpackaged WinUI 3 apps do not get these for free.
+                -->
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+                <!--
+                    Ether design-system entry point. Loads Foundation tokens (EtherColors,
+                    EtherSpacing, EtherTypography, EtherPrimitives) and all control templates
+                    (EtherButton, EtherSlider, EtherSegmentedControl, …) from the library.
+                -->
+                <ResourceDictionary Source="ms-appx:///Ether.DesignSystem.Controls/Themes/DesignSystem.xaml"/>
+                <!--
+                    Nexus app-level resources: styles not yet in Ether (EtherLabel) and
+                    Nexus-specific visuals (page-title gradient, data graphics).
+                -->
+                <ResourceDictionary Source="ms-appx:///Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

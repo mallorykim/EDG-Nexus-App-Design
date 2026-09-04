@@ -1,0 +1,34 @@
+<!--
+    NexusBatteryChip.xaml — Nexus Pattern — Battery indicator chip
+
+    Battery glyph + percentage, shown in the action bar for devices that have a
+    battery. Hidden by the action bar when a device has no battery.
+
+    FIXED: chip surface / border / glyph.
+    DYNAMIC: Percent (e.g. "84%").
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik node 502:4552 (2px BorderSubtle, radius 4).
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusBatteryChip"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border BorderBrush="{ThemeResource BorderSubtle}"
+            BorderThickness="2"
+            CornerRadius="{StaticResource RadiusControlSm}"
+            Padding="12,8,12,8">
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Center">
+            <FontIcon Glyph="&#xE858;"
+                      FontFamily="Segoe Fluent Icons"
+                      FontSize="18"
+                      Foreground="{ThemeResource TextSuccess}"
+                      VerticalAlignment="Center"/>
+            <TextBlock x:Name="PercentText"
+                       Text="84%"
+                       Style="{StaticResource EtherBodySSemiBold}"
+                       Foreground="{ThemeResource TextPrimary}"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+    </Border>
+</UserControl>

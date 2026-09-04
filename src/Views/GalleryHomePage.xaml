@@ -1,0 +1,84 @@
+<Page
+    x:Class="NexusApp.GalleryHomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NexusApp"
+    Background="{ThemeResource BackgroundCanvas}">
+
+    <!--
+        Gallery index: all peripheral groups and their screens, generated from
+        ScreenCatalog. Click a card to navigate to that screen. No hand-authored
+        items here — the catalog is the only source of truth.
+    -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Padding="32" Spacing="32">
+
+            <!-- Page header -->
+            <StackPanel Spacing="6">
+                <TextBlock Text="EDG Nexus App Design"
+                           FontFamily="{StaticResource InstrumentSans}"
+                           FontSize="32" FontWeight="SemiBold"
+                           Foreground="{ThemeResource TextPrimary}"/>
+                <TextBlock Text="Peripheral screen gallery — click a card to open the screen. Use the Light / Dark toggle in the left pane to switch themes."
+                           FontFamily="{StaticResource RobotoFont}"
+                           FontSize="14"
+                           Foreground="{ThemeResource TextSecondary}"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- Peripheral groups -->
+            <ItemsRepeater x:Name="GroupsRepeater">
+                <ItemsRepeater.Layout>
+                    <StackLayout Orientation="Vertical" Spacing="28"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:PeripheralGroup">
+                        <StackPanel Spacing="12">
+
+                            <!-- Group header -->
+                            <TextBlock Text="{x:Bind Peripheral}"
+                                       FontFamily="{StaticResource InstrumentSans}"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       CharacterSpacing="80"
+                                       Foreground="{ThemeResource TextTertiary}"/>
+
+                            <!-- Screen cards -->
+                            <ItemsRepeater ItemsSource="{x:Bind Screens}">
+                                <ItemsRepeater.Layout>
+                                    <UniformGridLayout Orientation="Horizontal"
+                                                        MinItemWidth="220" MinItemHeight="56"
+                                                        MinRowSpacing="12" MinColumnSpacing="12"/>
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="local:ScreenEntry">
+                                        <Button Tag="{x:Bind PageType}"
+                                                Click="Card_Click"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Padding="16,12"
+                                                CornerRadius="{StaticResource RadiusControl}"
+                                                Background="{ThemeResource BackgroundSurface}"
+                                                BorderBrush="{ThemeResource BorderSubtle}"
+                                                BorderThickness="1">
+                                            <TextBlock Text="{x:Bind Name}"
+                                                       FontFamily="{StaticResource InstrumentSans}"
+                                                       FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{ThemeResource TextPrimary}"
+                                                       VerticalAlignment="Center"
+                                                       TextWrapping="Wrap"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+
+            <Border Height="24"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

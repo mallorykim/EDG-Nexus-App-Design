@@ -1,0 +1,278 @@
+<Page
+    x:Class="NexusApp.Views.Keyboard.KeyboardBasePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Ether.DesignSystem.Controls"
+    Background="{ThemeResource BackgroundSurface}">
+
+    <!--
+        Keyboard — Base (connected state)
+        Template: nexus/page-templates.md → Template 1 (Peripheral Detail — Feature List)
+
+        SCAFFOLD STATUS: Structural zones are in place with placeholder content.
+        Replace placeholders with real Figma-matched content once Nexus Phase I
+        keyboard node IDs are captured in nexus/source-catalog.md.
+
+        Zone map (top → bottom):
+          1. Top masthead      — gear + plus + Updates + window controls (row 0)
+          2. Device identity   — device name + model + connection info (left column, top)
+          3. Device preview    — product image / illustration (left column, center)
+          4. Feature list      — right panel, scrollable (right column, full height)
+          5. Action bar        — battery + action buttons (row 2)
+    -->
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top masthead -->
+            <RowDefinition Height="Auto"/>
+            <!-- Main content area (device identity + preview | feature list) -->
+            <RowDefinition Height="*"/>
+            <!-- Action bar -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Row 0: Top masthead ──────────────────────────────────────── -->
+        <!--
+            NOTE: This masthead scaffold is a structural placeholder.
+            The real masthead will be NexusDeviceMasthead (Tier 2, to be built).
+            See nexus/component-gaps.md → NexusDeviceMasthead.
+        -->
+        <Border Grid.Row="0"
+                Background="{ThemeResource BackgroundSurface}"
+                BorderBrush="{ThemeResource BorderSubtle}"
+                BorderThickness="0,0,0,1"
+                Padding="16,0,16,0"
+                Height="48">
+            <Grid>
+                <!-- Left: back arrow (hidden on this screen — no parent in gallery) -->
+                <TextBlock Text="‹ Back"
+                           FontFamily="{StaticResource InterFont}"
+                           FontSize="13"
+                           Foreground="{ThemeResource TextSecondary}"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+
+                <!-- Right: global actions -->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                    <Button Content="⚙"
+                            ToolTipService.ToolTip="App Settings"
+                            FontSize="16"
+                            Padding="8,4"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="{ThemeResource TextSecondary}"/>
+                    <Button Content="＋"
+                            ToolTipService.ToolTip="Add a device"
+                            FontSize="16"
+                            Padding="8,4"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="{ThemeResource TextSecondary}"/>
+                    <Button Content="Updates"
+                            ToolTipService.ToolTip="View driver and firmware updates"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12" FontWeight="SemiBold"
+                            Padding="10,4"
+                            Background="Transparent"
+                            BorderBrush="{ThemeResource BorderSubtle}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Foreground="{ThemeResource TextSecondary}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ── Row 1: Main content area ─────────────────────────────────── -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- Left: device identity + preview -->
+                <ColumnDefinition Width="*"/>
+                <!-- Right: feature list panel -->
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left column -->
+            <Grid Grid.Column="0" Padding="32,24,32,0">
+                <Grid.RowDefinitions>
+                    <!-- Device identity (name + model) -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Device preview image -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Device identity -->
+                <!--
+                    PLACEHOLDER: Replace with real device name and model from Nexus Phase I Figma.
+                    Device name style → EtherH1 or EtherH2 per nexus/page-templates.md
+                -->
+                <StackPanel Grid.Row="0" Spacing="2">
+                    <TextBlock Text="Dell Pro Keyboard KB900"
+                               FontFamily="{StaticResource InstrumentSans}"
+                               FontSize="24" FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextPrimary}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="KB900"
+                                   FontFamily="{StaticResource InterFont}"
+                                   FontSize="13"
+                                   Foreground="{ThemeResource TextSecondary}"/>
+                        <TextBlock Text="●"
+                                   FontSize="6"
+                                   Foreground="{ThemeResource TextTertiary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="Bluetooth · Connected"
+                                   FontFamily="{StaticResource InterFont}"
+                                   FontSize="13"
+                                   Foreground="{ThemeResource TextSecondary}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Device preview area -->
+                <!--
+                    PLACEHOLDER: Replace Border with actual device product image.
+                    Image element: Stretch=Uniform, centered.
+                    Container: no border, no radius per nexus/page-templates.md.
+                -->
+                <Border Grid.Row="1"
+                        Margin="0,24,0,0"
+                        Background="{ThemeResource BackgroundSurface}"
+                        CornerRadius="8">
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="8">
+                        <TextBlock Text="[ Keyboard product image ]"
+                                   FontFamily="{StaticResource InterFont}"
+                                   FontSize="14"
+                                   Foreground="{ThemeResource TextTertiary}"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Replace with Image element → Stretch=Uniform"
+                                   FontFamily="{StaticResource InterFont}"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextTertiary}"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Right column: feature list panel -->
+            <!--
+                PLACEHOLDER: Replace with NexusFeatureListPanel (Tier 2, to be built).
+                See nexus/component-gaps.md → NexusFeatureListPanel.
+                Each row = NexusFeatureListRow (icon + label + chevron).
+            -->
+            <Border Grid.Column="1"
+                    Background="{ThemeResource BackgroundSurfaceRaised}"
+                    BorderBrush="{ThemeResource BorderSubtle}"
+                    BorderThickness="1,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Feature list rows — scaffold placeholders -->
+                        <!-- Replace with NexusFeatureListRow components once built -->
+                        <Border Padding="16,14"
+                                BorderBrush="{ThemeResource BorderSubtle}"
+                                BorderThickness="0,0,0,1">
+                            <Grid>
+                                <TextBlock Text="Key Mapping"
+                                           FontFamily="{StaticResource InterFont}"
+                                           FontSize="14"
+                                           Foreground="{ThemeResource TextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="›"
+                                           FontSize="18"
+                                           Foreground="{ThemeResource TextTertiary}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Border Padding="16,14"
+                                BorderBrush="{ThemeResource BorderSubtle}"
+                                BorderThickness="0,0,0,1">
+                            <Grid>
+                                <TextBlock Text="Backlight"
+                                           FontFamily="{StaticResource InterFont}"
+                                           FontSize="14"
+                                           Foreground="{ThemeResource TextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="›"
+                                           FontSize="18"
+                                           Foreground="{ThemeResource TextTertiary}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Border Padding="16,14"
+                                BorderBrush="{ThemeResource BorderSubtle}"
+                                BorderThickness="0,0,0,1">
+                            <Grid>
+                                <TextBlock Text="Battery"
+                                           FontFamily="{StaticResource InterFont}"
+                                           FontSize="14"
+                                           Foreground="{ThemeResource TextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="›"
+                                           FontSize="18"
+                                           Foreground="{ThemeResource TextTertiary}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Border Padding="16,14">
+                            <Grid>
+                                <TextBlock Text="Language"
+                                           FontFamily="{StaticResource InterFont}"
+                                           FontSize="14"
+                                           Foreground="{ThemeResource TextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="›"
+                                           FontSize="18"
+                                           Foreground="{ThemeResource TextTertiary}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ── Row 2: Action bar ─────────────────────────────────────────── -->
+        <!--
+            PLACEHOLDER: Replace with NexusActionBar (Tier 2, to be built).
+            See nexus/component-gaps.md → NexusActionBar.
+            Battery chip: NexusBatteryChip (Tier 2).
+        -->
+        <Border Grid.Row="2"
+                Background="{ThemeResource BackgroundSurface}"
+                BorderBrush="{ThemeResource BorderSubtle}"
+                BorderThickness="0,1,0,0"
+                Padding="32,12,32,12">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <!-- Battery chip placeholder -->
+                <Border Background="{ThemeResource BackgroundSurfaceRaised}"
+                        BorderBrush="{ThemeResource BorderSubtle}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="10,4">
+                    <TextBlock Text="🔋 84%"
+                               FontFamily="{StaticResource InterFont}"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextPrimary}"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Action buttons -->
+                <controls:EtherButton Content="Connect"
+                                      Style="{StaticResource EtherButtonSecondarySmall}"/>
+                <controls:EtherButton Content="Unpair"
+                                      Style="{StaticResource EtherButtonSecondarySmall}"/>
+                <controls:EtherButton Content="Restore to default"
+                                      Style="{StaticResource EtherButtonSecondarySmall}"/>
+                <controls:EtherButton Content="Forget"
+                                      Style="{StaticResource EtherButtonTertiarySmall}"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>

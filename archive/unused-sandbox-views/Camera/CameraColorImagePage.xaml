@@ -1,0 +1,412 @@
+<!--
+    CameraColorImagePage.xaml — Nexus · Camera · Feature Detail — Color and Image
+
+    Dell Pro 7 Webcam 4K (WB726) peripheral detail in the "Color and Image"
+    feature detail state (Template 2).
+
+    LEFT panel:  NexusDevicePreview textured surface + webcam product image
+                 + NexusDeviceHeader + camera-specific action bar
+    RIGHT panel: "Color and Image" scrollable settings:
+                   Smart AI toggles (Enhancement / HDR / AWB / Exposure)
+                   Face-focus segmented control
+                   Color sliders (Brightness / Sharpness / Contrast / Saturation)
+                   Vibrance slider
+                   Low Light Compensation toggle
+                   Presets dropdown
+                   Anti-Flicker segmented control (50Hz PAL / 60Hz NTSC)
+
+    Figma:  3IJ6irh4mxZxunV5PpV3Ik  node 634:18874
+    Asset:  Assets/Images/webcam-pro7-4k.png  (from Figma node 634:18890)
+
+    ─── DEVICE-SPECIFIC regions ────────────────────────────────────────────
+      NexusDeviceHeader  DeviceName="Dell Pro 7 Webcam 4K"  ModelText="WB726"
+      Webcam image       Assets/Images/webcam-pro7-4k.png
+      Action bar         HDMI (primary) + Restore to default (secondary)
+                         No battery chip — USB-wired device; no Unpair/Forget.
+      Right-panel controls — all are camera-specific
+    ─────────────────────────────────────────────────────────────────────────
+
+    NEW PATTERN — CameraActionBar:
+      USB-wired webcam action bars omit battery, Unpair, and Forget.
+      Connection type (HDMI) surfaces as a primary action chip instead.
+      Logged in nexus/components/component-log.md.
+-->
+<local:NexusPage
+    x:Class="NexusApp.Views.Camera.CameraColorImagePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NexusApp"
+    xmlns:nexus="using:NexusApp.Controls"
+    xmlns:controls="using:Ether.DesignSystem.Controls"
+    Background="{ThemeResource BackgroundInteractionModel}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Row 0: Global top bar (Updates · Add · Settings · caption) ── -->
+        <nexus:NexusTopBar Grid.Row="0" Padding="{StaticResource PaddingSm}"/>
+
+        <!-- ── Row 1: Main content — device preview (left) + detail panel (right) ── -->
+        <Grid Grid.Row="1"
+              Padding="16,0,16,16"
+              ColumnSpacing="{StaticResource SpaceSm}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="408"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 LEFT — Device preview surface (identical fixed chrome +
+                        DEVICE-SPECIFIC: header, image, action bar)
+            ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Column="0"
+                    CornerRadius="{StaticResource RadiusControl}">
+                <Grid>
+                    <!-- White textured surface (wave/dots) -->
+                    <nexus:NexusDevicePreview/>
+
+                    <!-- Overlay: header / product photo / action bar -->
+                    <Grid Margin="48,40,48,32">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- DEVICE-SPECIFIC: identity block -->
+                        <nexus:NexusDeviceHeader Grid.Row="0"
+                                                 DeviceName="Dell Pro 7 Webcam 4K"
+                                                 ModelText="WB726"/>
+
+                        <!-- DEVICE-SPECIFIC: product photograph -->
+                        <Image Grid.Row="1"
+                               Source="ms-appx:///Assets/Images/webcam-pro7-4k.png"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               MaxHeight="460"
+                               IsHitTestVisible="False"/>
+
+                        <!-- DEVICE-SPECIFIC: camera action bar
+                             USB-wired webcam — no battery chip.
+                             HDMI connection type as primary action. -->
+                        <StackPanel Grid.Row="2"
+                                    Orientation="Horizontal"
+                                    Spacing="{StaticResource SpaceSm}"
+                                    VerticalAlignment="Bottom">
+
+                            <!-- HDMI connection chip
+                                 Icon omitted: EtherButton.Content binds to TextBlock.Text,
+                                 so only string content is supported (same constraint as the
+                                 NexusActionBar Connect button — see component-log.md note). -->
+                            <controls:EtherButton Content="HDMI"
+                                                  Style="{StaticResource EtherButtonPrimarySmall}"
+                                                  Height="46"
+                                                  MinWidth="108"
+                                                  AutomationProperties.Name="HDMI connection"/>
+
+                            <!-- Restore to default -->
+                            <controls:EtherButton Content="Restore to default"
+                                                  Style="{StaticResource EtherButtonSecondarySmall}"
+                                                  Height="46"
+                                                  AutomationProperties.Name="Restore to default"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 RIGHT — "Color and Image" feature detail panel
+                 Header: back chevron + title + undo/redo
+                 Body:   scrollable sections separated by 1 px rules
+            ═══════════════════════════════════════════════════════════════ -->
+            <Grid Grid.Column="1" RowSpacing="{StaticResource SpaceSm}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Panel header row (52 px) -->
+                <Grid Grid.Row="0" Height="52">
+
+                    <!-- Back arrow + "Color and Image" -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="{StaticResource Space3xs}"
+                                VerticalAlignment="Center">
+                        <Button Background="Transparent"
+                                BorderThickness="0"
+                                Padding="{StaticResource PaddingXs}"
+                                AutomationProperties.Name="Back to features">
+                            <FontIcon Glyph="&#xE76B;"
+                                      FontFamily="Segoe Fluent Icons"
+                                      FontSize="16"
+                                      Foreground="{ThemeResource IconPrimary}"/>
+                        </Button>
+                        <TextBlock Text="Color and Image"
+                                   Style="{StaticResource EtherH1}"
+                                   Foreground="{ThemeResource TextPrimary}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Undo / Redo icon buttons -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="{StaticResource SpaceXs}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <Button BorderBrush="{ThemeResource BorderSubtle}"
+                                BorderThickness="1.5"
+                                Background="Transparent"
+                                CornerRadius="{StaticResource RadiusControlSm}"
+                                Padding="{StaticResource PaddingXs}"
+                                Height="36"
+                                AutomationProperties.Name="Undo">
+                            <FontIcon Glyph="&#xE7A7;"
+                                      FontFamily="Segoe Fluent Icons"
+                                      FontSize="14"
+                                      Foreground="{ThemeResource IconPrimary}"/>
+                        </Button>
+                        <Button BorderBrush="{ThemeResource BorderSubtle}"
+                                BorderThickness="1.5"
+                                Background="Transparent"
+                                CornerRadius="{StaticResource RadiusControlSm}"
+                                Padding="{StaticResource PaddingXs}"
+                                Height="36"
+                                AutomationProperties.Name="Redo">
+                            <FontIcon Glyph="&#xE7A6;"
+                                      FontFamily="Segoe Fluent Icons"
+                                      FontSize="14"
+                                      Foreground="{ThemeResource IconPrimary}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Scrollable settings body -->
+                <ScrollViewer Grid.Row="1"
+                              Padding="32,0,0,0"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+
+                        <!-- ── Section 1: Smart AI toggles + focus + color sliders ── -->
+                        <StackPanel Spacing="{StaticResource SpaceSm}" Padding="0,0,0,20">
+
+                            <!-- Smart Enhancement (top-level toggle) -->
+                            <Grid MinHeight="32">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource SpaceXs}"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Smart Enhancement"
+                                               Style="{StaticResource EtherH5}"
+                                               Foreground="{ThemeResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <FontIcon Glyph="&#xE946;"
+                                              FontFamily="Segoe Fluent Icons"
+                                              FontSize="14"
+                                              Foreground="{ThemeResource IconTertiary}"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ToggleSwitch Style="{StaticResource EtherSwitch}"
+                                              HorizontalAlignment="Right"
+                                              IsOn="True"
+                                              OnContent="On"
+                                              OffContent="Off"/>
+                            </Grid>
+
+                            <!-- Sub-settings — 16 px indent matches Figma -->
+                            <StackPanel Padding="16,0,0,0" Spacing="{StaticResource SpaceSm}">
+
+                                <!-- Smart HDR -->
+                                <Grid MinHeight="32">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="{StaticResource SpaceXs}"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Smart HDR"
+                                                   Style="{StaticResource EtherH5}"
+                                                   Foreground="{ThemeResource TextPrimary}"
+                                                   VerticalAlignment="Center"/>
+                                        <FontIcon Glyph="&#xE946;"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  FontSize="14"
+                                                  Foreground="{ThemeResource IconTertiary}"
+                                                  VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Style="{StaticResource EtherSwitch}"
+                                                  HorizontalAlignment="Right"
+                                                  IsOn="True"
+                                                  OnContent="On"
+                                                  OffContent="Off"/>
+                                </Grid>
+
+                                <!-- Smart Auto White Balance -->
+                                <Grid MinHeight="32">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="{StaticResource SpaceXs}"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Smart Auto White Balance"
+                                                   Style="{StaticResource EtherH5}"
+                                                   Foreground="{ThemeResource TextPrimary}"
+                                                   VerticalAlignment="Center"/>
+                                        <FontIcon Glyph="&#xE946;"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  FontSize="14"
+                                                  Foreground="{ThemeResource IconTertiary}"
+                                                  VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Style="{StaticResource EtherSwitch}"
+                                                  HorizontalAlignment="Right"
+                                                  IsOn="True"
+                                                  OnContent="On"
+                                                  OffContent="Off"/>
+                                </Grid>
+
+                                <!-- Smart Exposure + focus mode segmented control -->
+                                <StackPanel Spacing="{StaticResource SpaceXs}">
+                                    <Grid MinHeight="32">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="{StaticResource SpaceXs}"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="Smart Exposure"
+                                                       Style="{StaticResource EtherH5}"
+                                                       Foreground="{ThemeResource TextPrimary}"
+                                                       VerticalAlignment="Center"/>
+                                            <FontIcon Glyph="&#xE946;"
+                                                      FontFamily="Segoe Fluent Icons"
+                                                      FontSize="14"
+                                                      Foreground="{ThemeResource IconTertiary}"
+                                                      VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <ToggleSwitch Style="{StaticResource EtherSwitch}"
+                                                      HorizontalAlignment="Right"
+                                                      IsOn="True"
+                                                      OnContent="On"
+                                                      OffContent="Off"/>
+                                    </Grid>
+
+                                    <!-- Focus mode: Face focus / Center focus / General -->
+                                    <controls:EtherSegmentedControl
+                                            Style="{StaticResource EtherSegmentedTrack}"
+                                            HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource EtherSegment}"
+                                                         GroupName="FocusMode"
+                                                         Content="Face focus"
+                                                         IsChecked="True"
+                                                         HorizontalAlignment="Stretch"/>
+                                            <RadioButton Style="{StaticResource EtherSegment}"
+                                                         GroupName="FocusMode"
+                                                         Content="Center focus"
+                                                         HorizontalAlignment="Stretch"/>
+                                            <RadioButton Style="{StaticResource EtherSegment}"
+                                                         GroupName="FocusMode"
+                                                         Content="General"
+                                                         HorizontalAlignment="Stretch"/>
+                                        </StackPanel>
+                                    </controls:EtherSegmentedControl>
+                                </StackPanel>
+
+                                <!-- Color sliders -->
+                                <controls:EtherSteeringBar Title="Brightness" Value="75" HorizontalAlignment="Stretch"/>
+                                <controls:EtherSteeringBar Title="Sharpness"  Value="65" HorizontalAlignment="Stretch"/>
+                                <controls:EtherSteeringBar Title="Contrast"   Value="70" HorizontalAlignment="Stretch"/>
+                                <controls:EtherSteeringBar Title="Saturation" Value="70" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ── Section divider ── -->
+                        <Border Height="1" Background="{ThemeResource BorderSubtle}"/>
+
+                        <!-- ── Section 2: Vibrance ── -->
+                        <StackPanel Padding="0,20,0,20">
+                            <controls:EtherSteeringBar Title="Vibrance" Value="60" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+
+                        <!-- ── Section divider ── -->
+                        <Border Height="1" Background="{ThemeResource BorderSubtle}"/>
+
+                        <!-- ── Section 3: Low Light Compensation ── -->
+                        <StackPanel Padding="0,20,0,20">
+                            <Grid MinHeight="32">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource SpaceXs}"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Low Light Compensation"
+                                               Style="{StaticResource EtherH5}"
+                                               Foreground="{ThemeResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <FontIcon Glyph="&#xE946;"
+                                              FontFamily="Segoe Fluent Icons"
+                                              FontSize="14"
+                                              Foreground="{ThemeResource IconTertiary}"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ToggleSwitch Style="{StaticResource EtherSwitch}"
+                                              HorizontalAlignment="Right"
+                                              IsOn="True"
+                                              OnContent="On"
+                                              OffContent="Off"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- ── Section divider ── -->
+                        <Border Height="1" Background="{ThemeResource BorderSubtle}"/>
+
+                        <!-- ── Section 4: Presets ── -->
+                        <StackPanel Padding="0,20,0,20">
+                            <Grid MinHeight="32">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource SpaceXs}"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Presets"
+                                               Style="{StaticResource EtherH5}"
+                                               Foreground="{ThemeResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <FontIcon Glyph="&#xE946;"
+                                              FontFamily="Segoe Fluent Icons"
+                                              FontSize="14"
+                                              Foreground="{ThemeResource IconTertiary}"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ComboBox Style="{StaticResource EtherDropdown}"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          PlaceholderText="Add New Preset">
+                                    <ComboBoxItem Content="Save current settings"/>
+                                    <ComboBoxItem Content="Load preset…"/>
+                                </ComboBox>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- ── Section divider ── -->
+                        <Border Height="1" Background="{ThemeResource BorderSubtle}"/>
+
+                        <!-- ── Section 5: Anti-Flicker ── -->
+                        <StackPanel Padding="0,20,32,32" Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Text="Anti-Flicker"
+                                       Style="{StaticResource EtherH5}"
+                                       Foreground="{ThemeResource TextPrimary}"/>
+                            <!-- 50Hz PAL / 60Hz NTSC -->
+                            <controls:EtherSegmentedControl
+                                    Style="{StaticResource EtherSegmentedTrack}"
+                                    HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource EtherSegment}"
+                                                 GroupName="AntiFlicker"
+                                                 Content="50Hz PAL"
+                                                 IsChecked="True"
+                                                 HorizontalAlignment="Stretch"/>
+                                    <RadioButton Style="{StaticResource EtherSegment}"
+                                                 GroupName="AntiFlicker"
+                                                 Content="60Hz NTSC"
+                                                 HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                            </controls:EtherSegmentedControl>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:NexusPage>

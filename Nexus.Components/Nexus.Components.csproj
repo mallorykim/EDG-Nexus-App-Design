@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <!--
+      Keep the same root namespace as the controls already in the app, so every
+      view that currently says xmlns:nexus="using:NexusApp.Controls" keeps
+      working without any changes.
+    -->
+    <RootNamespace>NexusApp.Controls</RootNamespace>
+    <AssemblyName>Nexus.Components</AssemblyName>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWinUI>true</UseWinUI>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Reference the REAL Ether design-system library projects (local path, same
+      machine). When Ether publishes to a proper NuGet feed, swap these two
+      ProjectReferences for PackageReferences to Ether.DesignSystem.Controls and
+      Ether.DesignSystem.Foundation.
+    -->
+    <ProjectReference Include="..\..\EtherDesignLibrary\src\Ether.DesignSystem.Foundation\Ether.DesignSystem.Foundation.csproj" />
+    <ProjectReference Include="..\..\EtherDesignLibrary\src\Ether.DesignSystem.Controls\Ether.DesignSystem.Controls.csproj" />
+  </ItemGroup>
+
+
+</Project>

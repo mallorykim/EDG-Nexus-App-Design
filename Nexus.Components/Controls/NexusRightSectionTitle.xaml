@@ -1,0 +1,115 @@
+<!--
+    NexusRightSectionTitle.xaml — Nexus Pattern — Right panel section title with
+    a left-pointing chevron (back navigation), a primary title label, and an optional
+    breadcrumb segment that appears when the user has drilled into a sub-level.
+
+    BINDABLE STATE
+      TitleName       — primary label displayed to the right of the back chevron
+      BreadcrumbTitle — secondary crumb label shown after "/" when non-empty;
+                        when null or empty both the "/" separator and this label
+                        are collapsed (default state has no breadcrumb visible)
+
+    COMMANDS
+      BackCommand     — invoked when the user clicks the chevron-left icon button;
+                        CommandParameter = null
+
+    EVENTS (for code-behind consumers; ViewModels should prefer BackCommand)
+      BackRequested   — raised when the user clicks the chevron-left icon button
+
+    VISUAL STATES (BreadcrumbStates group)
+      NoBreadcrumb  — default: TitleName in text/primary; "/" + BreadcrumbTitle collapsed
+      HasBreadcrumb — TitleName dims to text/secondary; "/" + BreadcrumbTitle appear
+
+    SPACING (Figma inspect panel tokens)
+      space/sm  (12 epx) — gap between the back chevron and the title row
+      space/2xs  (4 epx) — gap between TitleName and "/", and between "/" and BreadcrumbTitle
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik node 1427-50484
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusRightSectionTitle"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Ether.DesignSystem.Controls">
+
+    <!--
+        IMPORTANT: Do NOT reference other NexusApp.Controls UserControls here
+        via <nexus:OtherControl>. The WinUI 3 toolchain cannot handle
+        intra-library UserControl cross-references in a ProjectReference context
+        (produces WMC0610). Inline shared visuals or compose in code-behind.
+    -->
+
+    <!-- Outer row: [chevron button] [gap: space/sm] [title + breadcrumb row] -->
+    <StackPanel Orientation="Horizontal"
+                VerticalAlignment="Center"
+                Spacing="{StaticResource space/sm}">
+
+        <!--
+            VSM — BreadcrumbStates
+            NoBreadcrumb  (default): TitleText uses text/primary; crumb elements collapsed.
+            HasBreadcrumb          : TitleText dims to text/secondary; crumb elements visible.
+            Using Setter (not Storyboard) so ThemeResource values re-evaluate on theme change.
+        -->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="BreadcrumbStates">
+                <VisualState x:Name="NoBreadcrumb"/>
+                <VisualState x:Name="HasBreadcrumb">
+                    <VisualState.Setters>
+                        <Setter Target="TitleText.Foreground"      Value="{ThemeResource text/secondary}"/>
+                        <Setter Target="SeparatorText.Visibility"  Value="Visible"/>
+                        <Setter Target="BreadcrumbText.Visibility" Value="Visible"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!-- Back chevron — always shown; click triggers BackCommand / BackRequested -->
+        <controls:EtherButton x:Name="BackButton"
+                               Style="{StaticResource EtherButtonSecondarySmall}"
+                               Width="32" Height="32"
+                               MinWidth="32" MinHeight="32"
+                               Padding="0"
+                               BorderThickness="0"
+                               VerticalAlignment="Center"
+                               Click="BackButton_Click"
+                               AutomationProperties.Name="Back">
+            <PathIcon Style="{StaticResource IconChevronLeft}"
+                      Width="16" Height="16"
+                      Foreground="{ThemeResource icon/secondary}"/>
+        </controls:EtherButton>
+
+        <!-- Title + optional breadcrumb: [TitleName] [/] [BreadcrumbTitle] -->
+        <!-- "/" and BreadcrumbTitle are Collapsed (NoBreadcrumb state) by default -->
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Spacing="{StaticResource space/2xs}">
+
+            <!-- TitleName: primary label; dims to text/secondary in HasBreadcrumb state -->
+            <TextBlock x:Name="TitleText"
+                       Text="{x:Bind TitleName, Mode=OneWay}"
+                       Style="{StaticResource headers/h4}"
+                       Foreground="{ThemeResource text/primary}"
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"/>
+
+            <!-- Separator — hidden in NoBreadcrumb state -->
+            <TextBlock x:Name="SeparatorText"
+                       Text="/"
+                       Style="{StaticResource headers/h4}"
+                       Foreground="{ThemeResource text/secondary}"
+                       VerticalAlignment="Center"
+                       Visibility="Collapsed"/>
+
+            <!-- Breadcrumb label — hidden in NoBreadcrumb state -->
+            <TextBlock x:Name="BreadcrumbText"
+                       Text="{x:Bind BreadcrumbTitle, Mode=OneWay}"
+                       Style="{StaticResource headers/h4}"
+                       Foreground="{ThemeResource text/primary}"
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"
+                       Visibility="Collapsed"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

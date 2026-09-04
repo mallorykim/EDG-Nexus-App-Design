@@ -1,0 +1,67 @@
+<!--
+    NexusActionBar.xaml — Nexus Pattern — Bottom device action bar
+
+    FIXED: Connect / Unpair / Restore to default / Forget always appear.
+    DYNAMIC: battery chip shows only when ShowBattery is true (device has a
+             battery); BatteryPercent sets the value.
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik node 502:4550.
+      Connect/Unpair/Restore → secondary buttons (2px BorderSubtle, radius 4)
+      Forget                 → orange outline + orange text (Orange600 / #FF6600)
+
+    Note: NexusBatteryChip is inlined here rather than nested as
+    <nexus:NexusBatteryChip> to avoid a WinUI 3 toolchain limitation with
+    intra-library UserControl cross-references (WMC0610). NexusBatteryChip
+    is still available as a standalone control in this library.
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusActionBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Ether.DesignSystem.Controls">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="NexusForgetBrush" Color="{StaticResource Orange600}"/>
+        <SolidColorBrush x:Key="NexusForgetBorderBrush" Color="{StaticResource Orange600}" Opacity="0.2"/>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+
+        <!-- Battery chip (inlined — see comment above) -->
+        <Border x:Name="BatteryChip"
+                BorderBrush="{ThemeResource BorderSubtle}"
+                BorderThickness="2"
+                CornerRadius="{StaticResource RadiusControlSm}"
+                Padding="12,8,12,8">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE858;"
+                          FontFamily="Segoe Fluent Icons"
+                          FontSize="18"
+                          Foreground="{ThemeResource TextSuccess}"
+                          VerticalAlignment="Center"/>
+                <TextBlock x:Name="PercentText"
+                           Text="84%"
+                           Style="{StaticResource EtherBodySSemiBold}"
+                           Foreground="{ThemeResource TextPrimary}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Connect / Unpair / Restore — Ether secondary buttons -->
+        <controls:EtherButton Content="Connect" Style="{StaticResource EtherButtonSecondarySmall}"/>
+        <controls:EtherButton Content="Unpair" Style="{StaticResource EtherButtonSecondarySmall}"/>
+        <controls:EtherButton Content="Restore to default" Style="{StaticResource EtherButtonSecondarySmall}"/>
+
+        <!-- Forget — orange outline + text -->
+        <Button BorderBrush="{StaticResource NexusForgetBorderBrush}"
+                BorderThickness="2"
+                Background="Transparent"
+                CornerRadius="{StaticResource RadiusControlSm}"
+                Padding="16,8,16,8"
+                AutomationProperties.Name="Forget">
+            <TextBlock Text="Forget"
+                       Style="{StaticResource EtherBodySSemiBold}"
+                       Foreground="{StaticResource NexusForgetBrush}"/>
+        </Button>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,38 @@
+<!--
+    NexusDevicePreview.xaml — Nexus Pattern — Device textured surface
+
+    FIXED: the white surface and its permanent texture (wave in Light, dots in
+    Dark). This control is the textured background only; the device image and
+    its placeholder are positioned in the page's overlay grid above this surface.
+
+    Texture swap follows the Ether convention: two Image elements toggled in
+    code-behind on theme change.
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik nodes 502:4490 (surface) / 502:4548 (image).
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusDevicePreview"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="{ThemeResource BackgroundSurface}">
+        <!-- Permanent surface texture -->
+        <Image x:Name="TextureLight"
+               Source="ms-appx:///Assets/Textures/wave-texture-light.png"
+               Stretch="UniformToFill"
+               Opacity="0.5"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               IsHitTestVisible="False"/>
+        <Image x:Name="TextureDark"
+               Source="ms-appx:///Assets/Textures/dots-texture-dark.png"
+               Stretch="UniformToFill"
+               Opacity="0.5"
+               Visibility="Collapsed"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               IsHitTestVisible="False"/>
+
+        <!-- Device image and placeholder are owned by the page overlay grid -->
+
+    </Grid>
+</UserControl>

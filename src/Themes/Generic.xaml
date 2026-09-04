@@ -1,0 +1,32 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Nexus app-level resource shell.
+
+        Ether tokens (EtherPrimitives / EtherColors / EtherSpacing / EtherTypography)
+        and all Ether control templates are loaded once in App.xaml via:
+            ms-appx:///Ether.DesignSystem.Controls/Themes/DesignSystem.xaml
+        Do NOT re-merge them here — duplicate merges waste memory and can cause
+        resource-lookup ambiguity.
+
+        This file adds only the Nexus-specific styles and visuals that are not part
+        of the shared Ether library. Add new Nexus resource dictionaries here as
+        they are built.
+    -->
+
+    <ResourceDictionary.MergedDictionaries>
+
+        <!-- ── Ether-adjacent: Label / filter-chip style (not yet in Ether package) ── -->
+        <ResourceDictionary Source="ms-appx:///src/Resources/Foundations/EtherLabel.xaml"/>
+
+        <!-- ── Nexus visual styles ── -->
+        <ResourceDictionary Source="ms-appx:///src/Resources/Visuals/EtherPageTitleGradient.xaml"/>
+        <ResourceDictionary Source="ms-appx:///src/Resources/Visuals/EtherDataGraphics.xaml"/>
+
+        <!-- Add new Nexus-specific resource dictionaries below this line: -->
+
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

@@ -1,0 +1,110 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>NexusApp.Gallery</RootNamespace>
+    <AssemblyName>Nexus.Components.Gallery</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- x64 only, same as EDGNexusApp/Nexus.Components — Ether only officially supports x64. -->
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWinUI>true</UseWinUI>
+    <!--
+      CS0436: WinUI 3 ProjectReference quirk — the XAML type-info generator
+      pulls source files from referenced library projects into this
+      project's compilation context. This creates apparent duplicate type
+      definitions (source vs. compiled DLL). The binary is correct;
+      suppress the noise. Same rationale as EDGNexusApp.csproj.
+    -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <!-- Unpackaged — no Package.appxmanifest required -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" />
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       The Gallery only references Nexus.Components — no direct Ether
+       ProjectReference here. Nexus.Components already brings in
+       Ether.DesignSystem.Foundation/Controls (transitively, including
+       DesignSystem.xaml's control templates/tokens), which is all the
+       Gallery needs to render Nexus controls and the EtherButton/
+       EtherCheckbox its generic chrome uses.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <ProjectReference Include="..\Nexus.Components\Nexus.Components.csproj" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Shared Nexus resource shell (Generic.xaml + the Foundations/
+       Visuals dictionaries it merges) — linked in from the app
+       project's src\ tree so the Gallery resolves the exact same
+       "ms-appx:///Generic.xaml" / "ms-appx:///src/..." resource keys
+       a Nexus control would find at runtime inside EDGNexusApp. Do
+       NOT copy these files; keep the app's copies as the single
+       source of truth.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Page Include="..\src\Themes\Generic.xaml">
+      <Link>Generic.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\src\Resources\Foundations\EtherLabel.xaml">
+      <Link>src\Resources\Foundations\EtherLabel.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\src\Resources\Visuals\EtherPageTitleGradient.xaml">
+      <Link>src\Resources\Visuals\EtherPageTitleGradient.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\src\Resources\Visuals\EtherDataGraphics.xaml">
+      <Link>src\Resources\Visuals\EtherDataGraphics.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Fonts — linked from the repo root so the Gallery renders text
+       with the same fonts as the real app.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Content Include="..\Fonts\Instrument_Sans\InstrumentSans-VariableFont_wdth,wght.ttf">
+      <Link>Fonts\Instrument_Sans\InstrumentSans-VariableFont_wdth,wght.ttf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Fonts\Inter\Inter-VariableFont_opsz,wght.ttf">
+      <Link>Fonts\Inter\Inter-VariableFont_opsz,wght.ttf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Content-area textures — NexusDevicePreview loads these by the
+       same "ms-appx:///Assets/Textures/..." path used inside EDGNexusApp.
+  ════════════════════════════════════════════════════════════════ -->
+  <ItemGroup>
+    <Content Include="..\Assets\Textures\*.png">
+      <Link>Assets\Textures\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

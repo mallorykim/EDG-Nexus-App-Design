@@ -1,0 +1,17 @@
+<!--
+    NexusPopupPage.xaml — intentionally empty shell.
+
+    All page content is built in code-behind (NexusPopupPage.xaml.cs) to avoid the
+    WinUI 3 x:Name-scope bug: x:Name elements that sit inside object-typed
+    DependencyProperties of a nested UserControl (ComponentPage.InteractiveContent,
+    ComponentPage.InteractiveControls) have their Connect() calls routed to the inner
+    control rather than this page, leaving every named field null at runtime.
+
+    Building via ComponentPage / ControlExample constructors in code-behind (exactly
+    as AutoControlPage.Build() does) sidesteps the issue entirely.
+-->
+<Page
+    x:Class="NexusApp.Gallery.Views.NexusControls.NexusPopupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+</Page>

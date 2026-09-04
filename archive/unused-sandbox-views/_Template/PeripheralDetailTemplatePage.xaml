@@ -1,0 +1,144 @@
+<local:NexusPage
+    x:Class="NexusApp.Views._Template.PeripheralDetailTemplatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NexusApp"
+    xmlns:nexus="using:NexusApp.Controls"
+    Background="{ThemeResource BackgroundInteractionModel}">
+
+    <!--
+        ══════════════════════════════════════════════════════════════════════
+        NEXUS PERIPHERAL DETAIL TEMPLATE — Feature List state
+        Figma: 3IJ6irh4mxZxunV5PpV3Ik node 502:4368
+        ══════════════════════════════════════════════════════════════════════
+
+        HOW TO USE THIS TEMPLATE
+        Copy this page for a new device screen and change ONLY the DEVICE-SPECIFIC
+        regions marked below. Everything else is fixed chrome and must not change.
+
+        NEVER CHANGE
+          • Page background (BackgroundInteractionModel gray)
+          • NexusTopBar (Updates / Add / Settings / window controls)
+          • The white device surface + its wave/dots texture (NexusDevicePreview)
+          • The right feature panel container
+          • NexusActionBar buttons (Connect / Unpair / Restore / Forget)
+
+        DEVICE-SPECIFIC (fill per device — mock values shown for now)
+          • Device name + model      → NexusDeviceHeader.DeviceName / .ModelText
+          • Device image             → NexusDevicePreview.DeviceImage
+          • Battery                  → NexusActionBar.ShowBattery / .BatteryPercent
+          • Feature category tiles   → the NexusFeatureListRow items in FeaturePanel
+    -->
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Nexus masthead: fixed 70px — panels (white + right) start at y=70 -->
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Row 0: Fixed top masthead strip ─────────────────────────────── -->
+        <nexus:NexusTopBar Grid.Row="0" Padding="{StaticResource PaddingSm}"/>
+
+        <!-- ── Row 1: White device surface  |  gray feature panel ──────────── -->
+        <Grid Grid.Row="1" Padding="16,0,16,16" ColumnSpacing="{StaticResource SpaceSm}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="360"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: white textured surface with header + image + action bar -->
+            <Border Grid.Column="0" CornerRadius="{StaticResource RadiusControl}">
+                <Grid>
+                    <!-- Fixed surface + permanent texture (wave Light / dots Dark) -->
+                    <nexus:NexusDevicePreview x:Name="DevicePreview"/>
+
+                    <!-- Overlay: device identity, image, and actions.
+                         Row heights and H-margins mirror Figma design-spec values:
+                           top spacer = Space2xl (48px)
+                           vertical gaps = SpaceXl (32px)
+                           header L/R = Space2xl (48px)
+                           image + bar L/R = SpaceXl (32px) -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48"/>   <!-- top inset: Space2xl -->
+                            <RowDefinition Height="Auto"/> <!-- device header -->
+                            <RowDefinition Height="32"/>   <!-- gap model → image: SpaceXl -->
+                            <RowDefinition Height="*"/>    <!-- device image area -->
+                            <RowDefinition Height="32"/>   <!-- gap image → action bar: SpaceXl -->
+                            <RowDefinition Height="Auto"/> <!-- action bar -->
+                            <RowDefinition Height="32"/>   <!-- bottom inset: SpaceXl -->
+                        </Grid.RowDefinitions>
+
+                        <!-- DEVICE-SPECIFIC: name + model; Space2xl (48px) L/R per spec -->
+                        <nexus:NexusDeviceHeader Grid.Row="1"
+                                                 x:Name="DeviceHeader"
+                                                 Margin="48,0,48,0"
+                                                 DeviceName="Dell Peripherals name"
+                                                 ModelText="Peripherals model"/>
+
+                        <!--
+                            DEVICE-SPECIFIC: peripheral product image.
+                            Set Source to a BitmapImage for the actual device PNG,
+                            set Visibility="Visible", then collapse ImagePlaceholder.
+                            SpaceXl (32px) L/R inset; fills remaining vertical space.
+                        -->
+                        <Image Grid.Row="3"
+                               x:Name="DeviceImageElement"
+                               Stretch="Uniform"
+                               Margin="32,0,32,0"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Visibility="Collapsed"/>
+
+                        <!-- Placeholder: collapse once real image source is set -->
+                        <Border Grid.Row="3"
+                                x:Name="ImagePlaceholder"
+                                Margin="32,0,32,0"
+                                Background="{ThemeResource BackgroundSurfaceRaised}"
+                                CornerRadius="{StaticResource RadiusSurface}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Width="360" Height="240">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Spacing="{StaticResource SpaceXs}">
+                                <FontIcon Glyph="&#xEB9F;"
+                                          FontFamily="Segoe Fluent Icons"
+                                          FontSize="32"
+                                          Foreground="{ThemeResource IconTertiary}"/>
+                                <TextBlock Text="Device image"
+                                           Style="{StaticResource EtherBodySRegular}"
+                                           Foreground="{ThemeResource TextTertiary}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- DEVICE-SPECIFIC: battery visibility / percent -->
+                        <nexus:NexusActionBar Grid.Row="5"
+                                              x:Name="ActionBar"
+                                              Margin="32,0,32,0"
+                                              ShowBattery="True"
+                                              BatteryPercent="84%"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT: feature category panel (feature-list state) -->
+            <ScrollViewer Grid.Column="1"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="{StaticResource PaddingSmH}">
+                <!--
+                    DEVICE-SPECIFIC: one NexusFeatureListRow per feature category.
+                    Set Glyph (Segoe Fluent Icons) + Label for each category.
+                -->
+                <StackPanel x:Name="FeaturePanel" Spacing="{StaticResource SpaceXs}">
+                    <nexus:NexusFeatureListRow Label="Feature name"/>
+                    <nexus:NexusFeatureListRow Label="Feature name"/>
+                    <nexus:NexusFeatureListRow Label="Feature name"/>
+                    <nexus:NexusFeatureListRow Label="Feature name"/>
+                    <nexus:NexusFeatureListRow Label="Feature name"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</local:NexusPage>

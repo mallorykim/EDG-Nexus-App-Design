@@ -1,0 +1,104 @@
+<!--
+    NexusPopup.xaml — Nexus Pattern — In-app popup card: a title bar with a
+    dismiss (X) button, a designer-defined read-only body, and an optional
+    primary/secondary action bar.
+
+    BINDABLE STATE
+      Title                     — popup title text, top-left of the title bar
+      BodyContent               — arbitrary read-only content hosted in the middle region
+      PrimaryButtonText         — label for the right-hand primary action button
+      IsPrimaryButtonVisible    — shows/hides the primary button (default true)
+      SecondaryButtonText       — label for the left-hand secondary action button
+      IsSecondaryButtonVisible  — shows/hides the secondary button (default true)
+
+    COMMANDS
+      PrimaryButtonCommand    — invoked when the primary button is clicked;
+                                CommandParameter = PrimaryButtonCommandParameter
+      SecondaryButtonCommand  — invoked when the secondary button is clicked;
+                                CommandParameter = SecondaryButtonCommandParameter
+      CloseCommand            — invoked when the title bar's dismiss (X) button is clicked
+
+    EVENTS (for code-behind consumers; ViewModels should prefer the commands above)
+      PrimaryButtonClick   — raised when the user clicks the primary button
+      SecondaryButtonClick — raised when the user clicks the secondary button
+      CloseButtonClick     — raised when the user clicks the dismiss (X) button
+
+    The action bar collapses entirely when both buttons are hidden, so the popup
+    also works as a plain informational card with no action row.
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik node 1427-44114
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusPopup"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Ether.DesignSystem.Controls">
+
+    <!--
+        IMPORTANT: Do NOT reference other NexusApp.Controls UserControls here
+        via <nexus:OtherControl>. The WinUI 3 toolchain cannot handle
+        intra-library UserControl cross-references in a ProjectReference context
+        (produces WMC0610). Inline shared visuals or compose in code-behind.
+    -->
+
+    <Border Background="{ThemeResource background/surface-raised}"
+            BorderBrush="{ThemeResource border/default}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource radius/surface}"
+            Padding="{StaticResource PaddingLg}">
+        <StackPanel Orientation="Vertical" Spacing="{StaticResource space/xl}">
+
+            <!-- Title bar: title on the left, dismiss (X) on the right. -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{x:Bind Title, Mode=OneWay}"
+                           Style="{StaticResource headers/h3}"
+                           Foreground="{ThemeResource text/primary}"
+                           TextWrapping="NoWrap"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center"/>
+
+                <controls:EtherButton x:Name="CloseButton"
+                                       Grid.Column="1"
+                                       Style="{StaticResource EtherButtonSecondarySmall}"
+                                       Width="32" Height="32"
+                                       MinWidth="32" MinHeight="32"
+                                       Padding="0"
+                                       BorderThickness="0"
+                                       VerticalAlignment="Center"
+                                       Click="CloseButton_Click"
+                                       AutomationProperties.Name="Close">
+                    <PathIcon Style="{StaticResource IconCloseX}" Width="12" Height="12"/>
+                </controls:EtherButton>
+            </Grid>
+
+            <!-- Middle content: read-only, shaped entirely by what the consumer supplies. -->
+            <ContentPresenter x:Name="BodyPresenter"
+                              Content="{x:Bind BodyContent, Mode=OneWay}"/>
+
+            <!-- Action bar: secondary (left) then primary (right), 12px apart, right-aligned. -->
+            <StackPanel x:Name="ActionBar"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="{StaticResource space/sm}">
+
+                <controls:EtherButton x:Name="SecondaryButton"
+                                       Style="{StaticResource EtherButtonSecondary}"
+                                       Content="{x:Bind SecondaryButtonText, Mode=OneWay}"
+                                       Visibility="{x:Bind IsSecondaryButtonVisible, Mode=OneWay}"
+                                       Click="SecondaryButton_Click"/>
+
+                <controls:EtherButton x:Name="PrimaryButton"
+                                       Style="{StaticResource EtherButtonPrimary}"
+                                       Content="{x:Bind PrimaryButtonText, Mode=OneWay}"
+                                       Visibility="{x:Bind IsPrimaryButtonVisible, Mode=OneWay}"
+                                       Click="PrimaryButton_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

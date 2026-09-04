@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="EDGNexusApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Nexus.Components/Nexus.Components.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Nexus.Components.Gallery/Nexus.Components.Gallery.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>

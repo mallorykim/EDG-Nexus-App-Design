@@ -1,0 +1,103 @@
+<local:NexusPage
+    x:Class="NexusApp.Views._Template.PeripheralDetailFeatureDetailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NexusApp"
+    xmlns:nexus="using:NexusApp.Controls"
+    Background="{ThemeResource BackgroundInteractionModel}">
+
+    <!--
+        ══════════════════════════════════════════════════════════════════════
+        NEXUS PERIPHERAL DETAIL TEMPLATE — Feature Detail state
+        Figma: 3IJ6irh4mxZxunV5PpV3Ik node 502:4327
+        ══════════════════════════════════════════════════════════════════════
+
+        Identical to the Feature List template EXCEPT the right panel: instead of
+        the category tiles it shows one category's configuration, with a back
+        chevron + the category title at the top (the title matches the tile the
+        user tapped).
+
+        Fixed vs device-specific rules are the same as the Feature List template.
+        DEVICE-SPECIFIC here also includes the feature title + the configuration
+        controls inside the panel.
+    -->
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <nexus:NexusTopBar Grid.Row="0" Padding="{StaticResource PaddingSm}"/>
+
+        <Grid Grid.Row="1" Padding="16,0,16,16" ColumnSpacing="{StaticResource SpaceSm}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="360"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: identical fixed surface -->
+            <Border Grid.Column="0" CornerRadius="{StaticResource RadiusControl}">
+                <Grid>
+                    <nexus:NexusDevicePreview/>
+                    <Grid Margin="48,40,48,32">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <nexus:NexusDeviceHeader Grid.Row="0"
+                                                 DeviceName="Dell Peripherals name"
+                                                 ModelText="Peripherals model"/>
+                        <nexus:NexusActionBar Grid.Row="2"
+                                              ShowBattery="True"
+                                              BatteryPercent="84%"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT: feature detail (one category's configuration) -->
+            <Grid Grid.Column="1" Padding="{StaticResource PaddingSmH}" RowSpacing="{StaticResource SpaceMd}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Back chevron + feature title (matches the tapped tile) -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Center">
+                    <Button Background="Transparent" BorderThickness="0" Padding="{StaticResource PaddingXs}"
+                            AutomationProperties.Name="Back to features">
+                        <FontIcon Glyph="&#xE76B;" FontFamily="Segoe Fluent Icons" FontSize="16"
+                                  Foreground="{ThemeResource IconPrimary}"/>
+                    </Button>
+                    <TextBlock Text="Feature name"
+                               Style="{StaticResource EtherH4}"
+                               Foreground="{ThemeResource TextPrimary}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- DEVICE-SPECIFIC: configuration controls for this feature -->
+                <StackPanel Grid.Row="1" Spacing="{StaticResource SpaceMd}">
+                    <Grid>
+                        <TextBlock Text="Setting label"
+                                   Style="{StaticResource EtherBodyMRegular}"
+                                   Foreground="{ThemeResource TextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <ToggleSwitch HorizontalAlignment="Right" IsOn="True" OnContent="" OffContent=""/>
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="Setting label"
+                                   Style="{StaticResource EtherBodyMRegular}"
+                                   Foreground="{ThemeResource TextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <ToggleSwitch HorizontalAlignment="Right" OnContent="" OffContent=""/>
+                    </Grid>
+                    <TextBlock Text="Supporting description for this configuration goes here."
+                               Style="{StaticResource EtherBodySRegular}"
+                               Foreground="{ThemeResource TextSecondary}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:NexusPage>

@@ -1,0 +1,228 @@
+using System.Globalization;
+using System.Runtime.InteropServices;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+
+namespace NexusApp.Gallery;
+
+public sealed partial class MainWindow : Window
+{
+    private bool _isDark;
+
+    /// <summary>
+    /// Guards against re-entrancy between <see cref="NavView_SelectionChanged"/> (which
+    /// drives the Frame) and <see cref="ContentFrame_Navigated"/> (which syncs the
+    /// NavigationView selection back after any navigation, including ones started from a
+    /// Home page card rather than the pane).
+    /// </summary>
+    private bool _isSyncingSelection;
+
+    public MainWindow()
+    {
+        this.InitializeComponent();
+        Title = GalleryStrings.Get("GalleryMainWindow001.Title", "Nexus Component Gallery");
+        ApplyOsLayoutDirection();
+        ResizeToDesignCanvas();
+        BuildNavigation();
+        ContentFrame.Navigate(ComponentCatalog.Home.PageType);
+    }
+
+    /// <summary>Design canvas the gallery mirrors, in effective (logical) pixels.</summary>
+    private const double DesignCanvasWidth = 1500;
+    private const double DesignCanvasHeight = 900;
+
+    // DllImport rather than the source-generated LibraryImport: the latter requires
+    // AllowUnsafeBlocks, which is not worth turning on project-wide for one call.
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint hwnd);
+
+    /// <summary>
+    /// Sizes the window so the canvas measures <see cref="DesignCanvasWidth"/> x
+    /// <see cref="DesignCanvasHeight"/> in effective pixels on any display scale.
+    /// </summary>
+    /// <remarks>
+    /// AppWindow works in physical pixels, so passing the design size straight through shrinks
+    /// the canvas on a scaled display — at 250% a 1500x900 call leaves roughly 587x325 of usable
+    /// canvas. Scaling by the window's DPI keeps the design size honest.
+    ///
+    /// ResizeClient rather than Resize: Resize sets the outer window size, so the title bar and
+    /// borders would come out of the canvas instead of surrounding it.
+    /// </remarks>
+    private void ResizeToDesignCanvas()
+    {
+        var handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var dpi = GetDpiForWindow(handle);
+        var scale = dpi == 0 ? 1d : dpi / 96d;   // 96 DPI is the unscaled baseline
+
+        AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(
+            (int)Math.Round(DesignCanvasWidth * scale),
+            (int)Math.Round(DesignCanvasHeight * scale)));
+    }
+
+    /// <summary>
+    /// Builds the NavigationView's menu items from <see cref="ComponentCatalog"/>: Home
+    /// first, then each category as a header followed by its component items, then any
+    /// top-level leaves. This is the only place that reads the catalog to build the pane —
+    /// nothing here is hand-authored per page.
+    /// </summary>
+    private void BuildNavigation()
+    {
+        var homeItem = new NavigationViewItem
+        {
+            Content = ComponentCatalog.Home.DisplayName,
+            Tag = ComponentCatalog.Home,
+            Icon = new SymbolIcon(Symbol.Home),
+        };
+        NavView.MenuItems.Add(homeItem);
+
+        foreach (var node in ComponentCatalog.Nodes)
+        {
+            switch (node)
+            {
+                case CatalogCategory category:
+                    NavView.MenuItems.Add(new NavigationViewItemHeader
+                    {
+                        // Uppercase + a top margin does the heavy lifting: "FOUNDATIONS" no
+                        // longer reads like the item "Colors" below it. Content stays a STRING
+                        // — the header's default template collapses a UIElement Content to 0x0
+                        // (verified), so a styled TextBlock there renders invisibly. FontSize /
+                        // CharacterSpacing are set on the instance; the default template's
+                        // ContentPresenter template-binds them. Foreground uses TextBrand (not
+                        // left to the template) so headers read as brand blue in both themes.
+                        Content = category.DisplayHeader.ToUpperInvariant(),
+                        FontSize = 11,
+                        CharacterSpacing = 80,
+                        Margin = new Thickness(0, 12, 0, 0),
+                        Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextBrand"],
+                    });
+                    foreach (var entry in category.Items)
+                    {
+                        var item = new NavigationViewItem
+                        {
+                            Content = BuildNavContent(entry),
+                            Tag = entry,
+                        };
+                        AutomationProperties.SetName(item, entry.DisplayName);
+                        NavView.MenuItems.Add(item);
+                    }
+                    break;
+
+                case CatalogLeaf leaf:
+                    {
+                        var item = new NavigationViewItem
+                        {
+                            Content = BuildNavContent(leaf.Entry),
+                            Tag = leaf.Entry,
+                        };
+                        AutomationProperties.SetName(item, leaf.Entry.DisplayName);
+                        NavView.MenuItems.Add(item);
+                    }
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unhandled catalog node '{node.GetType().FullName}'.");
+            }
+        }
+
+        NavView.SelectedItem = homeItem;
+    }
+
+    /// <summary>
+    /// A nav item's content: just the name, or the name plus an UPDATED and/or PRIMITIVE TOKEN
+    /// badge. The TextBlock sets no font or foreground so it inherits the nav item's own —
+    /// including the selected-state colour — exactly like the plain-string items.
+    /// </summary>
+    private static object BuildNavContent(ComponentEntry entry)
+    {
+        if (!entry.IsUpdated && !entry.IsPrimitive) return entry.DisplayName;
+
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        panel.Children.Add(new TextBlock { Text = entry.DisplayName, VerticalAlignment = VerticalAlignment.Center });
+        if (entry.IsUpdated) panel.Children.Add(new Ether.DesignSystem.Controls.UpdatedBadge());
+        if (entry.IsPrimitive) panel.Children.Add(new Ether.DesignSystem.Controls.PrimitiveBadge());
+        return panel;
+    }
+
+    /// <summary>
+    /// Navigates to the page for a nav item's <see cref="ComponentEntry"/>. Always calls
+    /// Navigate rather than short-circuiting on "already there": auto-discovered entries
+    /// all share <see cref="Views.AutoControlPage"/> as their PageType, so comparing
+    /// PageType alone can't tell two different controls' nav items apart — the
+    /// NavigationParameter (the target control's Type) is what actually distinguishes them.
+    /// </summary>
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (_isSyncingSelection) return;
+        if (args.SelectedItem is NavigationViewItem { Tag: ComponentEntry entry })
+        {
+            try
+            {
+                ContentFrame.Navigate(entry.PageType, entry.NavigationParameter!);
+            }
+            catch (Exception ex)
+            {
+                PageTitle.Text = $"Nav threw: {ex.GetType().Name}: {ex.Message}";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Keeps the pane selection in sync with the Frame regardless of what triggered the
+    /// navigation — the NavigationView itself, or a card on the Home page. Matches on both
+    /// PageType and NavigationParameter for the same reason as <see cref="NavView_SelectionChanged"/>.
+    /// </summary>
+    private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+    {
+        foreach (var item in NavView.MenuItems)
+        {
+            if (item is NavigationViewItem { Tag: ComponentEntry entry } navItem &&
+                entry.PageType == e.SourcePageType &&
+                Equals(entry.NavigationParameter, e.Parameter))
+            {
+                if (!ReferenceEquals(NavView.SelectedItem, navItem))
+                {
+                    _isSyncingSelection = true;
+                    NavView.SelectedItem = navItem;
+                    _isSyncingSelection = false;
+                }
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Flips the whole shell between Light and Dark. Setting <see cref="RootGrid"/>'s
+    /// RequestedTheme is the single lever: it re-resolves every {ThemeResource} in the
+    /// tree — including the NavigationView pane items (NavigationViewItemForeground) and
+    /// RootGrid's own BackgroundCanvas — so no brush needs poking by hand.
+    /// </summary>
+    private void ThemeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _isDark = !_isDark;
+        RootGrid.RequestedTheme = _isDark ? ElementTheme.Dark : ElementTheme.Light;
+        ThemeToggle.Content = _isDark
+            ? GalleryStrings.Get("GalleryMainWindow.ThemeDark.Content", "🌙 Dark")
+            : GalleryStrings.Get("GalleryMainWindow002.Content", "☀ Light");
+    }
+
+    private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
+    {
+        // Don't re-throw — crashing the app makes diagnosing impossible. Log to the page title area.
+        e.Handled = true;
+        PageTitle.Text = $"Nav failed: {e.SourcePageType?.Name} — {e.Exception?.GetType().Name}: {e.Exception?.Message}";
+    }
+
+    private void ApplyOsLayoutDirection()
+    {
+        if (CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft)
+        {
+            RootGrid.FlowDirection = FlowDirection.RightToLeft;
+        }
+    }
+}

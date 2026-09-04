@@ -1,0 +1,12 @@
+<Page
+    x:Class="NexusApp.Gallery.Views.AutoControlPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Reflection-driven fallback page — see NexusControlDiscovery.cs. One Page type
+        serves every uncataloged Nexus control; the target control Type comes through as
+        the Frame.Navigate parameter (OnNavigatedTo below), and the whole ComponentPage
+        chrome is built in code since it varies per control.
+    -->
+</Page>

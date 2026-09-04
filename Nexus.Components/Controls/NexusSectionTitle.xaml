@@ -1,0 +1,81 @@
+<!--
+    NexusSectionTitle.xaml — Nexus Pattern — Left section header with back chevron,
+    device title, model name, and an inline info icon.
+
+    BINDABLE STATE
+      TitleName  — device or section name displayed in headers/h4 style
+      ModelName  — device model identifier displayed in body/m-regular style
+
+    Layout (left → right):
+      [← IconChevronLeft]  (space/md gap)
+      [Column:
+         TitleName          (headers/h4, TextPrimary)
+         (space/lg gap)
+         [Row: ModelName (body/m-regular, TextSecondary)  (space/xs gap)  (i) IconAlertInfoCir]
+      ]
+
+    Spacing tokens (Figma → Ether):
+      spacing/16  →  {StaticResource space/md}  =  16 epx  (chevron ↔ title block)
+      spacing/24  →  {StaticResource space/lg}  =  24 epx  (TitleName ↔ ModelName row)
+      spacing/8   →  {StaticResource space/xs}  =   8 epx  (ModelName ↔ info icon)
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik  node 1427:44114
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusSectionTitle"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        IMPORTANT: Do NOT reference other NexusApp.Controls UserControls here
+        via <nexus:OtherControl>. The WinUI3 XAML toolchain cannot handle
+        intra-library UserControl cross-references in a ProjectReference context
+        (produces WMC0610). Inline shared visuals or compose in code-behind.
+    -->
+
+    <!-- Outer row: [chevron]  (space/md)  [title + model column] -->
+    <StackPanel Orientation="Horizontal"
+                Spacing="{StaticResource space/md}"
+                VerticalAlignment="Center">
+
+        <!-- Static: left-pointing chevron (navigation back indicator) -->
+        <PathIcon Style="{StaticResource IconChevronLeft}"
+                  Foreground="{ThemeResource icon/primary}"
+                  Width="{StaticResource IconSizeMd}"
+                  Height="{StaticResource IconSizeMd}"
+                  VerticalAlignment="Center"
+                  AutomationProperties.Name="Back"/>
+
+        <!-- Title + model name column -->
+        <StackPanel Orientation="Vertical"
+                    Spacing="{StaticResource space/lg}">
+
+            <!-- TitleName: device/section name (OneWay) -->
+            <TextBlock Text="{x:Bind TitleName, Mode=OneWay}"
+                       Style="{StaticResource headers/h4}"
+                       Foreground="{ThemeResource text/primary}"/>
+
+            <!-- ModelName row: [model text]  (space/xs)  [static info icon] -->
+            <StackPanel Orientation="Horizontal"
+                        Spacing="{StaticResource space/xs}"
+                        VerticalAlignment="Center">
+
+                <!-- ModelName: device model identifier (OneWay) -->
+                <TextBlock Text="{x:Bind ModelName, Mode=OneWay}"
+                           Style="{StaticResource body/m-regular}"
+                           Foreground="{ThemeResource text/secondary}"
+                           VerticalAlignment="Center"/>
+
+                <!-- Static: info icon -->
+                <PathIcon Style="{StaticResource IconAlertInfoCir}"
+                          Foreground="{ThemeResource icon/secondary}"
+                          Width="{StaticResource IconSizeXs}"
+                          Height="{StaticResource IconSizeXs}"
+                          VerticalAlignment="Center"
+                          AutomationProperties.Name="Info"/>
+
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

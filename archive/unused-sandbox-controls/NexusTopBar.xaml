@@ -1,0 +1,103 @@
+<!--
+    NexusTopBar.xaml — Nexus Pattern — Global masthead action strip
+
+    FIXED CHROME. Do not change per device.
+    Right-aligned strip that sits at the top of every peripheral detail page:
+      Updates (refresh glyph + label + count badge) · Add · Settings gear ·
+      window caption controls (minimize / maximize / close).
+
+    DYNAMIC: only UpdateCount (the number in the blue badge).
+
+    Figma: 3IJ6irh4mxZxunV5PpV3Ik node 502:4368 (Frame 2147253527 + Shop/Updates)
+    Icons: Segoe Fluent Icons glyphs (matches Figma caption controls E921/E922/E8BB).
+-->
+<UserControl
+    x:Class="NexusApp.Controls.NexusTopBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <Style x:Key="NexusTopBarIconButton" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Spacing="{StaticResource Space2xs}">
+
+        <!-- Updates (DDS renew icon + label + count badge) -->
+        <Button Style="{StaticResource NexusTopBarIconButton}"
+                Width="Auto"
+                Padding="{StaticResource PaddingSmH}"
+                ToolTipService.ToolTip="View driver and firmware updates"
+                AutomationProperties.Name="Updates">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Center">
+                <!-- DDS renew icon (32×32 viewbox scaled to 16×16) -->
+                <Viewbox Width="16" Height="16">
+                    <Canvas Width="32" Height="32">
+                        <Path Fill="{ThemeResource IconSecondary}"
+                              Data="M18.5971 28.7378C15.6609 29.3368 12.6079 28.903 9.95476 27.5099C7.89427 26.4279 6.17321 24.8189 4.95728 22.8625L4.95728 29H2.95728L2.95728 21C2.95728 20.4477 3.40499 20 3.95728 20H11.9573V22H6.77879C7.79932 23.5681 9.20936 24.8595 10.8846 25.7391C13.1295 26.918 15.7128 27.285 18.1973 26.7782C20.6818 26.2713 22.9149 24.9217 24.5187 22.9576C26.1225 20.9936 26.9985 18.5358 26.9985 16.0002H28.9985C28.9985 18.9968 27.9632 21.9015 26.0678 24.2226C24.1724 26.5438 21.5333 28.1388 18.5971 28.7378Z"/>
+                        <Path Fill="{ThemeResource IconSecondary}"
+                              Data="M2.95728 15.9999C2.95728 13.0498 3.96068 10.1874 5.80263 7.88301C7.64459 5.57862 10.2156 3.96925 13.0932 3.31929C15.9708 2.66934 18.9838 3.01745 21.6374 4.30645C23.8302 5.3716 25.6697 7.02687 26.9579 9.07265V2.99976L28.9579 2.99976L28.9579 10.9998C28.9579 11.552 28.5102 11.9998 27.9579 11.9998L19.9579 11.9998L19.9579 9.99976L25.1768 9.99976C24.0917 8.33253 22.5692 6.98253 20.7636 6.10544C18.5182 5.01475 15.9687 4.72019 13.5338 5.27015C11.0989 5.82011 8.92346 7.18189 7.36489 9.13176C5.80631 11.0816 4.95728 13.5036 4.95728 15.9999L2.95728 15.9999Z"/>
+                    </Canvas>
+                </Viewbox>
+                <TextBlock Text="Updates"
+                           Style="{StaticResource EtherBodySSemiBold}"
+                           Foreground="{ThemeResource TextSecondary}"
+                           VerticalAlignment="Center"/>
+                <Border x:Name="UpdatesBadge"
+                        CornerRadius="{StaticResource RadiusPill}"
+                        Padding="6,2,6,2"
+                        VerticalAlignment="Center">
+                    <Border.Background>
+                        <SolidColorBrush Color="{StaticResource Blue600}"/>
+                    </Border.Background>
+                    <TextBlock x:Name="UpdatesBadgeText"
+                               Text="3"
+                               Style="{StaticResource EtherMicroSemiBold}"
+                               Foreground="{ThemeResource TextInverse}"/>
+                </Border>
+            </StackPanel>
+        </Button>
+
+        <!-- Add a device (dds_add-cir icon, 32×32 viewbox scaled to 16×16) -->
+        <Button Style="{StaticResource NexusTopBarIconButton}"
+                ToolTipService.ToolTip="Add a device"
+                AutomationProperties.Name="Add a device">
+            <Viewbox Width="16" Height="16">
+                <Canvas Width="32" Height="32">
+                    <Path Fill="{ThemeResource IconPrimary}"
+                          Data="M15.0003 10.0002V15.0004H10.0002V17.0004H15.0003V22.0005H17.0004V17.0004H22.0005V15.0004H17.0004V10.0002H15.0003Z"/>
+                    <Path Fill="{ThemeResource IconPrimary}"
+                          Data="M16 2.00005C8.26801 2.00005 2 8.26806 2 16C2 23.732 8.26801 30 16 30C23.732 30 30 23.732 30 16C30 8.26806 23.732 2.00005 16 2.00005ZM4 16C4 9.37263 9.37258 4.00005 16 4.00005C22.6274 4.00005 28 9.37263 28 16C28 22.6275 22.6274 28 16 28C9.37258 28 4 22.6275 4 16Z"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+
+        <!-- App settings -->
+        <Button Style="{StaticResource NexusTopBarIconButton}"
+                ToolTipService.ToolTip="App settings"
+                AutomationProperties.Name="App settings">
+            <FontIcon Glyph="&#xE713;"
+                      FontFamily="Segoe Fluent Icons"
+                      FontSize="16"
+                      Foreground="{ThemeResource IconPrimary}"/>
+        </Button>
+
+        <!-- Window caption controls (decorative in the gallery frame) -->
+        <FontIcon Glyph="&#xE921;" FontFamily="Segoe Fluent Icons" FontSize="10"
+                  Foreground="{ThemeResource IconPrimary}" Width="46" Height="40"/>
+        <FontIcon Glyph="&#xE922;" FontFamily="Segoe Fluent Icons" FontSize="10"
+                  Foreground="{ThemeResource IconPrimary}" Width="46" Height="40"/>
+        <FontIcon Glyph="&#xE8BB;" FontFamily="Segoe Fluent Icons" FontSize="10"
+                  Foreground="{ThemeResource IconPrimary}" Width="46" Height="40"/>
+    </StackPanel>
+</UserControl>
